@@ -57,7 +57,7 @@ public class TaskItemRepositoryTests
 			TaskItemRepository repository = new TaskItemRepository(context);
 			TaskItem? taskToUpdate = await repository.GetByIdAsync(task.Id, CancellationToken.None);
 			Assert.NotNull(taskToUpdate);
-			taskToUpdate.Update("Estudar EF Core", null, TaskItemStatus.Completed, null);
+			taskToUpdate.Update("Estudar EF Core", null, TaskItemStatus.Concluida, null);
 			await repository.UpdateAsync(taskToUpdate, CancellationToken.None);
 		}
 
@@ -67,7 +67,7 @@ public class TaskItemRepositoryTests
 
 		Assert.NotNull(updatedTask);
 		Assert.Equal("Estudar EF Core", updatedTask.Title);
-		Assert.Equal(TaskItemStatus.Completed, updatedTask.Status);
+		Assert.Equal(TaskItemStatus.Concluida, updatedTask.Status);
 	}
 
 	[Fact]
@@ -96,13 +96,13 @@ public class TaskItemRepositoryTests
 	{
 		await AddTasksAsync(new List<TaskItem>
 		{
-			new TaskItem("Pendente", null, TaskItemStatus.Pending),
-			new TaskItem("Concluída", null, TaskItemStatus.Completed)
+			new TaskItem("Pendente", null, TaskItemStatus.Pendente),
+			new TaskItem("Concluída", null, TaskItemStatus.Concluida)
 		});
 
 		using AppDbContext context = CreateContext();
 		TaskItemRepository repository = new TaskItemRepository(context);
-		List<TaskItem> tasks = await repository.ListAsync(new TaskItemFilter { Status = TaskItemStatus.Completed }, CancellationToken.None);
+		List<TaskItem> tasks = await repository.ListAsync(new TaskItemFilter { Status = TaskItemStatus.Concluida }, CancellationToken.None);
 
 		Assert.Single(tasks);
 		Assert.Equal("Concluída", tasks[0].Title);
@@ -114,9 +114,9 @@ public class TaskItemRepositoryTests
 		DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
 		await AddTasksAsync(new List<TaskItem>
 		{
-			new TaskItem("No início", null, TaskItemStatus.Pending, today.AddDays(1)),
-			new TaskItem("No fim", null, TaskItemStatus.Pending, today.AddDays(5)),
-			new TaskItem("Depois do fim", null, TaskItemStatus.Pending, today.AddDays(6)),
+			new TaskItem("No início", null, TaskItemStatus.Pendente, today.AddDays(1)),
+			new TaskItem("No fim", null, TaskItemStatus.Pendente, today.AddDays(5)),
+			new TaskItem("Depois do fim", null, TaskItemStatus.Pendente, today.AddDays(6)),
 			new TaskItem("Sem data")
 		});
 
@@ -137,8 +137,8 @@ public class TaskItemRepositoryTests
 		await AddTasksAsync(new List<TaskItem>
 		{
 			new TaskItem("Sem data"),
-			new TaskItem("Vence depois", null, TaskItemStatus.Pending, today.AddDays(10)),
-			new TaskItem("Vence antes", null, TaskItemStatus.Pending, today.AddDays(2))
+			new TaskItem("Vence depois", null, TaskItemStatus.Pendente, today.AddDays(10)),
+			new TaskItem("Vence antes", null, TaskItemStatus.Pendente, today.AddDays(2))
 		});
 
 		using AppDbContext context = CreateContext();
@@ -158,7 +158,7 @@ public class TaskItemRepositoryTests
 		{
 			new TaskItem("Sem data 1"),
 			new TaskItem("Sem data 2"),
-			new TaskItem("Com data", null, TaskItemStatus.Pending, today.AddDays(3))
+			new TaskItem("Com data", null, TaskItemStatus.Pendente, today.AddDays(3))
 		});
 
 		using AppDbContext context = CreateContext();

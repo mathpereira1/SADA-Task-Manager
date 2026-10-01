@@ -10,7 +10,7 @@ public class TaskItem
 	public TaskItemStatus Status { get; private set; }
 	public DateOnly? DueDate { get; private set; }
 
-	public TaskItem(string title, string? description = null, TaskItemStatus status = TaskItemStatus.Pending, DateOnly? dueDate = null)
+	public TaskItem(string title, string? description = null, TaskItemStatus status = TaskItemStatus.Pendente, DateOnly? dueDate = null)
 	{
 		Validate(title, description, status);
 		ValidateDueDateIsNotInThePast(dueDate);

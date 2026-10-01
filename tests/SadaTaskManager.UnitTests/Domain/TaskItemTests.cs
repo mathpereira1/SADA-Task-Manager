@@ -10,12 +10,12 @@ public class TaskItemTests
 	{
 		DateOnly dueDate = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(5);
 
-		TaskItem task = new TaskItem("Estudar C#", "Capítulo 3", TaskItemStatus.Completed, dueDate);
+		TaskItem task = new TaskItem("Estudar C#", "Capítulo 3", TaskItemStatus.Concluida, dueDate);
 
 		Assert.NotEqual(Guid.Empty, task.Id);
 		Assert.Equal("Estudar C#", task.Title);
 		Assert.Equal("Capítulo 3", task.Description);
-		Assert.Equal(TaskItemStatus.Completed, task.Status);
+		Assert.Equal(TaskItemStatus.Concluida, task.Status);
 		Assert.Equal(dueDate, task.DueDate);
 	}
 
@@ -26,7 +26,7 @@ public class TaskItemTests
 
 		Assert.Null(task.Description);
 		Assert.Null(task.DueDate);
-		Assert.Equal(TaskItemStatus.Pending, task.Status);
+		Assert.Equal(TaskItemStatus.Pendente, task.Status);
 	}
 
 	[Theory]
@@ -76,7 +76,7 @@ public class TaskItemTests
 	{
 		DateOnly yesterday = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-1);
 
-		Assert.Throws<DomainException>(() => new TaskItem("Estudar C#", null, TaskItemStatus.Pending, yesterday));
+		Assert.Throws<DomainException>(() => new TaskItem("Estudar C#", null, TaskItemStatus.Pendente, yesterday));
 	}
 
 	[Fact]
@@ -84,7 +84,7 @@ public class TaskItemTests
 	{
 		DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
 
-		TaskItem task = new TaskItem("Estudar C#", null, TaskItemStatus.Pending, today);
+		TaskItem task = new TaskItem("Estudar C#", null, TaskItemStatus.Pendente, today);
 
 		Assert.Equal(today, task.DueDate);
 	}
@@ -96,12 +96,12 @@ public class TaskItemTests
 		Guid originalId = task.Id;
 		DateOnly newDueDate = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(10);
 
-		task.Update("Estudar EF Core", "Capítulo 5", TaskItemStatus.InProgress, newDueDate);
+		task.Update("Estudar EF Core", "Capítulo 5", TaskItemStatus.EmProgresso, newDueDate);
 
 		Assert.Equal(originalId, task.Id);
 		Assert.Equal("Estudar EF Core", task.Title);
 		Assert.Equal("Capítulo 5", task.Description);
-		Assert.Equal(TaskItemStatus.InProgress, task.Status);
+		Assert.Equal(TaskItemStatus.EmProgresso, task.Status);
 		Assert.Equal(newDueDate, task.DueDate);
 	}
 
@@ -109,9 +109,9 @@ public class TaskItemTests
 	public void Update_WithNullDescriptionAndDueDate_ClearsValues()
 	{
 		DateOnly dueDate = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(5);
-		TaskItem task = new TaskItem("Estudar C#", "Capítulo 3", TaskItemStatus.Pending, dueDate);
+		TaskItem task = new TaskItem("Estudar C#", "Capítulo 3", TaskItemStatus.Pendente, dueDate);
 
-		task.Update("Estudar C#", null, TaskItemStatus.Pending, null);
+		task.Update("Estudar C#", null, TaskItemStatus.Pendente, null);
 
 		Assert.Null(task.Description);
 		Assert.Null(task.DueDate);
@@ -124,7 +124,7 @@ public class TaskItemTests
 	{
 		TaskItem task = new TaskItem("Estudar C#");
 
-		Assert.Throws<DomainException>(() => task.Update(title, null, TaskItemStatus.Pending, null));
+		Assert.Throws<DomainException>(() => task.Update(title, null, TaskItemStatus.Pendente, null));
 	}
 
 	[Fact]
@@ -132,13 +132,13 @@ public class TaskItemTests
 	{
 		DateOnly dueDate = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(5);
 		DateOnly yesterday = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-1);
-		TaskItem task = new TaskItem("Estudar C#", "Capítulo 3", TaskItemStatus.Pending, dueDate);
+		TaskItem task = new TaskItem("Estudar C#", "Capítulo 3", TaskItemStatus.Pendente, dueDate);
 
-		Assert.Throws<DomainException>(() => task.Update("Estudar EF Core", "Capítulo 5", TaskItemStatus.Completed, yesterday));
+		Assert.Throws<DomainException>(() => task.Update("Estudar EF Core", "Capítulo 5", TaskItemStatus.Concluida, yesterday));
 
 		Assert.Equal("Estudar C#", task.Title);
 		Assert.Equal("Capítulo 3", task.Description);
-		Assert.Equal(TaskItemStatus.Pending, task.Status);
+		Assert.Equal(TaskItemStatus.Pendente, task.Status);
 		Assert.Equal(dueDate, task.DueDate);
 	}
 }

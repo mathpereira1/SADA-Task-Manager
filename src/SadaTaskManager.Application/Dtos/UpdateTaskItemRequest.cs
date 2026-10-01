@@ -6,15 +6,19 @@ namespace SadaTaskManager.Application.Dtos;
 
 public record UpdateTaskItemRequest
 {
-	[Required]
-	[MaxLength(TaskItemConstraints.TitleMaxLength)]
+	/// <summary>Título da tarefa (obrigatório, até 100 caracteres).</summary>
+	[Required(ErrorMessage = "O título é obrigatório.")]
+	[MaxLength(TaskItemConstraints.TitleMaxLength, ErrorMessage = "O título deve ter no máximo {1} caracteres.")]
 	public string Title { get; init; } = string.Empty;
 
-	[MaxLength(TaskItemConstraints.DescriptionMaxLength)]
+	/// <summary>Descrição (até 1000 caracteres). Enviar nulo apaga a descrição atual.</summary>
+	[MaxLength(TaskItemConstraints.DescriptionMaxLength, ErrorMessage = "A descrição deve ter no máximo {1} caracteres.")]
 	public string? Description { get; init; }
 
-	[EnumDataType(typeof(TaskItemStatus))]
+	/// <summary>Status: "Pendente", "EmProgresso" ou "Concluida".</summary>
+	[EnumDataType(typeof(TaskItemStatus), ErrorMessage = "Status inválido.")]
 	public TaskItemStatus Status { get; init; }
 
+	/// <summary>Data de vencimento (AAAA-MM-DD). Enviar nulo apaga a data; uma data nova não pode estar no passado.</summary>
 	public DateOnly? DueDate { get; init; }
 }

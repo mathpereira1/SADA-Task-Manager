@@ -5,11 +5,14 @@ namespace SadaTaskManager.Application.Dtos;
 
 public record TaskItemFilter : IValidatableObject
 {
-	[EnumDataType(typeof(TaskItemStatus))]
+	/// <summary>Filtra por status: "Pendente", "EmProgresso" ou "Concluida".</summary>
+	[EnumDataType(typeof(TaskItemStatus), ErrorMessage = "Status inválido.")]
 	public TaskItemStatus? Status { get; init; }
 
+	/// <summary>Vencimento a partir desta data, inclusive (AAAA-MM-DD).</summary>
 	public DateOnly? DueDateFrom { get; init; }
 
+	/// <summary>Vencimento até esta data, inclusive (AAAA-MM-DD).</summary>
 	public DateOnly? DueDateTo { get; init; }
 
 	public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

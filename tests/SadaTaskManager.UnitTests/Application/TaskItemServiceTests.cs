@@ -62,13 +62,13 @@ public class TaskItemServiceTests
 	{
 		TaskItem task = new TaskItem("Estudar C#");
 		_repository.Tasks.Add(task);
-		UpdateTaskItemRequest request = new UpdateTaskItemRequest { Title = "Estudar EF Core", Status = TaskItemStatus.Completed };
+		UpdateTaskItemRequest request = new UpdateTaskItemRequest { Title = "Estudar EF Core", Status = TaskItemStatus.Concluida };
 
 		TaskItemResponse? response = await _service.UpdateAsync(task.Id, request, CancellationToken.None);
 
 		Assert.NotNull(response);
 		Assert.Equal("Estudar EF Core", response.Title);
-		Assert.Equal(TaskItemStatus.Completed, response.Status);
+		Assert.Equal(TaskItemStatus.Concluida, response.Status);
 		Assert.Equal(1, _repository.UpdateCount);
 	}
 
@@ -76,7 +76,7 @@ public class TaskItemServiceTests
 	public async Task ListAsync_PassesFilterToRepository()
 	{
 		_repository.Tasks.Add(new TaskItem("Estudar C#"));
-		TaskItemFilter filter = new TaskItemFilter { Status = TaskItemStatus.Pending };
+		TaskItemFilter filter = new TaskItemFilter { Status = TaskItemStatus.Pendente };
 
 		TaskItemListResponse response = await _service.ListAsync(filter, CancellationToken.None);
 

@@ -1,4 +1,70 @@
 @SadaTaskManager.Api_HostAddress = http://localhost:5020
 
+### Criar tarefa
+# @name createTask
+POST {{SadaTaskManager.Api_HostAddress}}/api/tasks
+Content-Type: application/json
 
-###
+{
+	"title": "Estudar C#",
+	"description": "Capítulo 3",
+	"status": "EmProgresso",
+	"dueDate": "{{$datetime "yyyy-MM-dd" 5 d}}"
+}
+
+### Criar tarefa sem data de vencimento
+POST {{SadaTaskManager.Api_HostAddress}}/api/tasks
+Content-Type: application/json
+
+{
+	"title": "Ler documentação do EF Core"
+}
+
+### Listar todas as tarefas
+GET {{SadaTaskManager.Api_HostAddress}}/api/tasks
+
+### Listar por status
+GET {{SadaTaskManager.Api_HostAddress}}/api/tasks?status=EmProgresso
+
+### Listar por intervalo de vencimento (mostra quantas tarefas sem data ficaram de fora)
+GET {{SadaTaskManager.Api_HostAddress}}/api/tasks?dueDateFrom={{$datetime "yyyy-MM-dd"}}&dueDateTo={{$datetime "yyyy-MM-dd" 30 d}}
+
+### Buscar a tarefa criada
+GET {{SadaTaskManager.Api_HostAddress}}/api/tasks/{{createTask.response.body.$.id}}
+
+### Editar a tarefa criada (PUT substitui todos os campos)
+PUT {{SadaTaskManager.Api_HostAddress}}/api/tasks/{{createTask.response.body.$.id}}
+Content-Type: application/json
+
+{
+	"title": "Estudar C# e EF Core",
+	"description": null,
+	"status": "Concluida",
+	"dueDate": null
+}
+
+### Excluir a tarefa criada
+DELETE {{SadaTaskManager.Api_HostAddress}}/api/tasks/{{createTask.response.body.$.id}}
+
+### Erro 400: título vazio
+POST {{SadaTaskManager.Api_HostAddress}}/api/tasks
+Content-Type: application/json
+
+{
+	"title": ""
+}
+
+### Erro 400: vencimento no passado
+POST {{SadaTaskManager.Api_HostAddress}}/api/tasks
+Content-Type: application/json
+
+{
+	"title": "Tarefa atrasada",
+	"dueDate": "{{$datetime "yyyy-MM-dd" -1 d}}"
+}
+
+### Erro 400: filtro com data inicial maior que a final
+GET {{SadaTaskManager.Api_HostAddress}}/api/tasks?dueDateFrom={{$datetime "yyyy-MM-dd" 10 d}}&dueDateTo={{$datetime "yyyy-MM-dd"}}
+
+### Erro 404: tarefa inexistente
+GET {{SadaTaskManager.Api_HostAddress}}/api/tasks/00000000-0000-0000-0000-000000000001
