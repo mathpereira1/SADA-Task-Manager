@@ -15,6 +15,8 @@ public class FakeTaskItemRepository : ITaskItemRepository
 
 	public int TasksWithoutDueDateCount { get; set; }
 
+	public TaskItemStatus? LastCountStatus { get; private set; }
+
 	public Task AddAsync(TaskItem task, CancellationToken cancellationToken)
 	{
 		Tasks.Add(task);
@@ -42,6 +44,7 @@ public class FakeTaskItemRepository : ITaskItemRepository
 
 	public Task<int> CountWithoutDueDateAsync(TaskItemStatus? status, CancellationToken cancellationToken)
 	{
+		LastCountStatus = status;
 		return Task.FromResult(TasksWithoutDueDateCount);
 	}
 

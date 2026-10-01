@@ -167,4 +167,22 @@ public class TaskItemRepositoryTests
 
 		Assert.Equal(2, count);
 	}
+
+	[Fact]
+	public async Task CountWithoutDueDateAsync_WithStatus_CountsOnlyThatStatus()
+	{
+		DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
+		await AddTasksAsync(new List<TaskItem>
+		{
+			new TaskItem("Sem data pendente"),
+			new TaskItem("Sem data concluída", null, TaskItemStatus.Concluida),
+			new TaskItem("Com data concluída", null, TaskItemStatus.Concluida, today.AddDays(3))
+		});
+
+		using AppDbContext context = CreateContext();
+		TaskItemRepository repository = new TaskItemRepository(context);
+		int count = await repository.CountWithoutDueDateAsync(TaskItemStatus.Concluida, CancellationToken.None);
+
+		Assert.Equal(1, count);
+	}
 }

@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc;
 using SadaTaskManager.Application.Dtos;
 using SadaTaskManager.Domain.Enums;
 
@@ -115,6 +116,17 @@ public class TasksEndpointsTests : IDisposable
 	}
 
 	[Fact]
+	public async Task List_WithDueDateFromAfterDueDateTo_Returns400WithMessage()
+	{
+		HttpResponseMessage response = await _client.GetAsync("/api/tasks?dueDateFrom=2030-12-10&dueDateTo=2030-12-01");
+
+		Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+		string body = await response.Content.ReadAsStringAsync();
+		Assert.Contains("A data inicial do filtro não pode ser maior que a data final.", body);
+	}
+
+	[Fact]
 	public async Task Update_ThenGetById_ReturnsUpdatedTask()
 	{
 		TaskItemResponse task = await CreateTaskAsync(new CreateTaskItemRequest { Title = "Estudar C#" });
@@ -130,6 +142,57 @@ public class TasksEndpointsTests : IDisposable
 	}
 
 	[Fact]
+	public async Task Update_WithoutStatus_Returns400AndKeepsTask()
+	{
+		TaskItemResponse task = await CreateTaskAsync(new CreateTaskItemRequest { Title = "Estudar C#", Status = TaskItemStatus.Concluida });
+		object request = new { title = "Sem status" };
+
+		HttpResponseMessage updateResponse = await _client.PutAsJsonAsync($"/api/tasks/{task.Id}", request, _jsonOptions);
+		TaskItemResponse? unchangedTask = await _client.GetFromJsonAsync<TaskItemResponse>($"/api/tasks/{task.Id}", _jsonOptions);
+
+		Assert.Equal(HttpStatusCode.BadRequest, updateResponse.StatusCode);
+
+		ValidationProblemDetails? problem = await updateResponse.Content.ReadFromJsonAsync<ValidationProblemDetails>(_jsonOptions);
+		Assert.NotNull(problem);
+		Assert.True(problem.Errors.ContainsKey("Status"));
+		Assert.Contains("O status é obrigatório.", problem.Errors["Status"]);
+
+		Assert.NotNull(unchangedTask);
+		Assert.Equal("Estudar C#", unchangedTask.Title);
+		Assert.Equal(TaskItemStatus.Concluida, unchangedTask.Status);
+	}
+
+	[Fact]
+	public async Task Update_WithPastDueDate_Returns400AndKeepsTask()
+	{
+		TaskItemResponse task = await CreateTaskAsync(new CreateTaskItemRequest { Title = "Estudar C#" });
+		DateOnly yesterday = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-1);
+		UpdateTaskItemRequest request = new UpdateTaskItemRequest { Title = "Atrasada", Status = TaskItemStatus.Pendente, DueDate = yesterday };
+
+		HttpResponseMessage updateResponse = await _client.PutAsJsonAsync($"/api/tasks/{task.Id}", request, _jsonOptions);
+		TaskItemResponse? unchangedTask = await _client.GetFromJsonAsync<TaskItemResponse>($"/api/tasks/{task.Id}", _jsonOptions);
+
+		Assert.Equal(HttpStatusCode.BadRequest, updateResponse.StatusCode);
+
+		string body = await updateResponse.Content.ReadAsStringAsync();
+		Assert.Contains("A data de vencimento não pode estar no passado.", body);
+
+		Assert.NotNull(unchangedTask);
+		Assert.Equal("Estudar C#", unchangedTask.Title);
+		Assert.Null(unchangedTask.DueDate);
+	}
+
+	[Fact]
+	public async Task Update_WithUnknownId_Returns404()
+	{
+		UpdateTaskItemRequest request = new UpdateTaskItemRequest { Title = "Estudar C#", Status = TaskItemStatus.Pendente };
+
+		HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/tasks/{Guid.NewGuid()}", request, _jsonOptions);
+
+		Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+	}
+
+	[Fact]
 	public async Task Delete_ThenGetById_Returns404()
 	{
 		TaskItemResponse task = await CreateTaskAsync(new CreateTaskItemRequest { Title = "Estudar C#" });
@@ -139,6 +202,14 @@ public class TasksEndpointsTests : IDisposable
 
 		Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
 		Assert.Equal(HttpStatusCode.NotFound, getResponse.StatusCode);
+	}
+
+	[Fact]
+	public async Task Delete_WithUnknownId_Returns404()
+	{
+		HttpResponseMessage response = await _client.DeleteAsync($"/api/tasks/{Guid.NewGuid()}");
+
+		Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
 	}
 
 	[Fact]

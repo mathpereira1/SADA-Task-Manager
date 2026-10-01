@@ -73,6 +73,20 @@ public class TaskItemServiceTests
 	}
 
 	[Fact]
+	public async Task UpdateAsync_WithoutStatus_ThrowsDomainExceptionAndDoesNotUpdate()
+	{
+		TaskItem task = new TaskItem("Estudar C#", null, TaskItemStatus.Concluida);
+		_repository.Tasks.Add(task);
+		UpdateTaskItemRequest request = new UpdateTaskItemRequest { Title = "Sem status" };
+
+		await Assert.ThrowsAsync<DomainException>(() => _service.UpdateAsync(task.Id, request, CancellationToken.None));
+
+		Assert.Equal("Estudar C#", task.Title);
+		Assert.Equal(TaskItemStatus.Concluida, task.Status);
+		Assert.Equal(0, _repository.UpdateCount);
+	}
+
+	[Fact]
 	public async Task ListAsync_PassesFilterToRepository()
 	{
 		_repository.Tasks.Add(new TaskItem("Estudar C#"));
@@ -96,6 +110,16 @@ public class TaskItemServiceTests
 	}
 
 	[Fact]
+	public async Task ListAsync_WithDueDateAndStatusFilter_PassesStatusToCount()
+	{
+		TaskItemFilter filter = new TaskItemFilter { Status = TaskItemStatus.Concluida, DueDateFrom = DateOnly.FromDateTime(DateTime.UtcNow) };
+
+		await _service.ListAsync(filter, CancellationToken.None);
+
+		Assert.Equal(TaskItemStatus.Concluida, _repository.LastCountStatus);
+	}
+
+	[Fact]
 	public async Task ListAsync_WithoutDueDateFilter_ReturnsZeroTasksWithoutDueDate()
 	{
 		_repository.TasksWithoutDueDateCount = 2;
@@ -116,5 +140,16 @@ public class TaskItemServiceTests
 
 		Assert.True(deleted);
 		Assert.Empty(_repository.Tasks);
+	}
+
+	[Fact]
+	public async Task DeleteAsync_WithUnknownId_ReturnsFalse()
+	{
+		_repository.Tasks.Add(new TaskItem("Estudar C#"));
+
+		bool deleted = await _service.DeleteAsync(Guid.NewGuid(), CancellationToken.None);
+
+		Assert.False(deleted);
+		Assert.Single(_repository.Tasks);
 	}
 }

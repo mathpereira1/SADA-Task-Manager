@@ -66,7 +66,12 @@ public class TaskItemService : ITaskItemService
 			return null;
 		}
 
-		task.Update(request.Title, request.Description, request.Status, request.DueDate);
+		if (request.Status == null)
+		{
+			throw new DomainException("O status é obrigatório.");
+		}
+
+		task.Update(request.Title, request.Description, request.Status.Value, request.DueDate);
 
 		await _repository.UpdateAsync(task, cancellationToken);
 

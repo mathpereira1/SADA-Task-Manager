@@ -15,9 +15,10 @@ public record UpdateTaskItemRequest
 	[MaxLength(TaskItemConstraints.DescriptionMaxLength, ErrorMessage = "A descrição deve ter no máximo {1} caracteres.")]
 	public string? Description { get; init; }
 
-	/// <summary>Status: "Pendente", "EmProgresso" ou "Concluida".</summary>
+	/// <summary>Status (obrigatório): "Pendente", "EmProgresso" ou "Concluida".</summary>
+	[Required(ErrorMessage = "O status é obrigatório.")]
 	[EnumDataType(typeof(TaskItemStatus), ErrorMessage = "Status inválido.")]
-	public TaskItemStatus Status { get; init; }
+	public TaskItemStatus? Status { get; init; }
 
 	/// <summary>Data de vencimento (AAAA-MM-DD). Enviar nulo apaga a data; uma data nova não pode estar no passado.</summary>
 	public DateOnly? DueDate { get; init; }
