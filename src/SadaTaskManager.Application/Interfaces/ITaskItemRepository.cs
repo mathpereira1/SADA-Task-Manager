@@ -1,6 +1,5 @@
 using SadaTaskManager.Application.Dtos;
 using SadaTaskManager.Domain;
-using SadaTaskManager.Domain.Enums;
 
 namespace SadaTaskManager.Application.Interfaces;
 
@@ -12,7 +11,7 @@ public interface ITaskItemRepository
 
 	Task<List<TaskItem>> ListAsync(TaskItemFilter filter, CancellationToken cancellationToken);
 
-	Task<int> CountWithoutDueDateAsync(TaskItemStatus? status, CancellationToken cancellationToken);
+	Task<int> CountWithoutDueDateAsync(TaskItemFilter filter, CancellationToken cancellationToken);
 
 	Task UpdateAsync(TaskItem task, CancellationToken cancellationToken);
 

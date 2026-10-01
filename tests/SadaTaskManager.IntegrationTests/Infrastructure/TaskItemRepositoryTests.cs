@@ -163,7 +163,7 @@ public class TaskItemRepositoryTests
 
 		using AppDbContext context = CreateContext();
 		TaskItemRepository repository = new TaskItemRepository(context);
-		int count = await repository.CountWithoutDueDateAsync(null, CancellationToken.None);
+		int count = await repository.CountWithoutDueDateAsync(new TaskItemFilter(), CancellationToken.None);
 
 		Assert.Equal(2, count);
 	}
@@ -181,8 +181,59 @@ public class TaskItemRepositoryTests
 
 		using AppDbContext context = CreateContext();
 		TaskItemRepository repository = new TaskItemRepository(context);
-		int count = await repository.CountWithoutDueDateAsync(TaskItemStatus.Concluida, CancellationToken.None);
+		int count = await repository.CountWithoutDueDateAsync(new TaskItemFilter { Status = TaskItemStatus.Concluida }, CancellationToken.None);
 
 		Assert.Equal(1, count);
+	}
+
+	[Fact]
+	public async Task CountWithoutDueDateAsync_WithSearch_CountsOnlyMatchingTitles()
+	{
+		await AddTasksAsync(new List<TaskItem>
+		{
+			new TaskItem("Estudar C#"),
+			new TaskItem("Ler livro")
+		});
+
+		using AppDbContext context = CreateContext();
+		TaskItemRepository repository = new TaskItemRepository(context);
+		int count = await repository.CountWithoutDueDateAsync(new TaskItemFilter { Search = "estudar" }, CancellationToken.None);
+
+		Assert.Equal(1, count);
+	}
+
+	[Fact]
+	public async Task ListAsync_WithSearch_ReturnsTitlesContainingTextIgnoringCase()
+	{
+		await AddTasksAsync(new List<TaskItem>
+		{
+			new TaskItem("Estudar C#"),
+			new TaskItem("Revisar: estudar EF Core"),
+			new TaskItem("Ler livro")
+		});
+
+		using AppDbContext context = CreateContext();
+		TaskItemRepository repository = new TaskItemRepository(context);
+		List<TaskItem> tasks = await repository.ListAsync(new TaskItemFilter { Search = "ESTUDAR" }, CancellationToken.None);
+
+		Assert.Equal(2, tasks.Count);
+		Assert.Equal("Estudar C#", tasks[0].Title);
+		Assert.Equal("Revisar: estudar EF Core", tasks[1].Title);
+	}
+
+	[Fact]
+	public async Task ListAsync_WithBlankSearch_ReturnsAllTasks()
+	{
+		await AddTasksAsync(new List<TaskItem>
+		{
+			new TaskItem("Estudar C#"),
+			new TaskItem("Ler livro")
+		});
+
+		using AppDbContext context = CreateContext();
+		TaskItemRepository repository = new TaskItemRepository(context);
+		List<TaskItem> tasks = await repository.ListAsync(new TaskItemFilter { Search = "   " }, CancellationToken.None);
+
+		Assert.Equal(2, tasks.Count);
 	}
 }

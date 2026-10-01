@@ -116,6 +116,19 @@ public class TasksEndpointsTests : IDisposable
 	}
 
 	[Fact]
+	public async Task List_WithSearch_ReturnsOnlyMatchingTitles()
+	{
+		await CreateTaskAsync(new CreateTaskItemRequest { Title = "Estudar C#" });
+		await CreateTaskAsync(new CreateTaskItemRequest { Title = "Ler livro" });
+
+		TaskItemListResponse? response = await _client.GetFromJsonAsync<TaskItemListResponse>("/api/tasks?search=estudar", _jsonOptions);
+
+		Assert.NotNull(response);
+		Assert.Single(response.Items);
+		Assert.Equal("Estudar C#", response.Items[0].Title);
+	}
+
+	[Fact]
 	public async Task List_WithDueDateFromAfterDueDateTo_Returns400WithMessage()
 	{
 		HttpResponseMessage response = await _client.GetAsync("/api/tasks?dueDateFrom=2030-12-10&dueDateTo=2030-12-01");

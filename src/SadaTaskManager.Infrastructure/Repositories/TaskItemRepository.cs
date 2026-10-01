@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using SadaTaskManager.Application.Dtos;
 using SadaTaskManager.Application.Interfaces;
 using SadaTaskManager.Domain;
-using SadaTaskManager.Domain.Enums;
 using SadaTaskManager.Infrastructure.Persistence;
 
 namespace SadaTaskManager.Infrastructure.Repositories;
@@ -49,6 +48,12 @@ public class TaskItemRepository : ITaskItemRepository
 			query = query.Where(task => task.DueDate <= filter.DueDateTo);
 		}
 
+		if (!string.IsNullOrWhiteSpace(filter.Search))
+		{
+			string search = filter.Search.Trim().ToLower();
+			query = query.Where(task => task.Title.ToLower().Contains(search));
+		}
+
 		query = query
 			.OrderBy(task => task.DueDate == null)
 			.ThenBy(task => task.DueDate)
@@ -59,13 +64,19 @@ public class TaskItemRepository : ITaskItemRepository
 		return tasks;
 	}
 
-	public async Task<int> CountWithoutDueDateAsync(TaskItemStatus? status, CancellationToken cancellationToken)
+	public async Task<int> CountWithoutDueDateAsync(TaskItemFilter filter, CancellationToken cancellationToken)
 	{
 		IQueryable<TaskItem> query = _context.TaskItems.Where(task => task.DueDate == null);
 
-		if (status != null)
+		if (filter.Status != null)
 		{
-			query = query.Where(task => task.Status == status);
+			query = query.Where(task => task.Status == filter.Status);
+		}
+
+		if (!string.IsNullOrWhiteSpace(filter.Search))
+		{
+			string search = filter.Search.Trim().ToLower();
+			query = query.Where(task => task.Title.ToLower().Contains(search));
 		}
 
 		int count = await query.CountAsync(cancellationToken);

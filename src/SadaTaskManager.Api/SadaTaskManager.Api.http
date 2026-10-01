@@ -26,6 +26,9 @@ GET {{SadaTaskManager.Api_HostAddress}}/api/tasks
 ### Listar por status
 GET {{SadaTaskManager.Api_HostAddress}}/api/tasks?status=EmProgresso
 
+### Buscar por texto no título (sem diferenciar maiúsculas)
+GET {{SadaTaskManager.Api_HostAddress}}/api/tasks?search=estudar
+
 ### Listar por intervalo de vencimento (mostra quantas tarefas sem data ficaram de fora)
 GET {{SadaTaskManager.Api_HostAddress}}/api/tasks?dueDateFrom={{$datetime "yyyy-MM-dd"}}&dueDateTo={{$datetime "yyyy-MM-dd" 30 d}}
 

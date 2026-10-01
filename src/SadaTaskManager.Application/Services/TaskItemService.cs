@@ -50,7 +50,7 @@ public class TaskItemService : ITaskItemService
 
 		if (filter.DueDateFrom != null || filter.DueDateTo != null)
 		{
-			tasksWithoutDueDate = await _repository.CountWithoutDueDateAsync(filter.Status, cancellationToken);
+			tasksWithoutDueDate = await _repository.CountWithoutDueDateAsync(filter, cancellationToken);
 		}
 
 		return new TaskItemListResponse(items, tasksWithoutDueDate);

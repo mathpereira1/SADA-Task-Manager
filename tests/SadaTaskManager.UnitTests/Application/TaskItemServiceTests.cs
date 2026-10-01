@@ -110,13 +110,13 @@ public class TaskItemServiceTests
 	}
 
 	[Fact]
-	public async Task ListAsync_WithDueDateAndStatusFilter_PassesStatusToCount()
+	public async Task ListAsync_WithDueDateFilter_PassesSameFilterToCount()
 	{
-		TaskItemFilter filter = new TaskItemFilter { Status = TaskItemStatus.Concluida, DueDateFrom = DateOnly.FromDateTime(DateTime.UtcNow) };
+		TaskItemFilter filter = new TaskItemFilter { Status = TaskItemStatus.Concluida, Search = "estudar", DueDateFrom = DateOnly.FromDateTime(DateTime.UtcNow) };
 
 		await _service.ListAsync(filter, CancellationToken.None);
 
-		Assert.Equal(TaskItemStatus.Concluida, _repository.LastCountStatus);
+		Assert.Same(filter, _repository.LastCountFilter);
 	}
 
 	[Fact]

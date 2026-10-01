@@ -34,7 +34,7 @@ public class TasksController : ControllerBase
 	}
 
 	/// <summary>
-	/// Lista as tarefas, com filtros opcionais por status e por intervalo de vencimento.
+	/// Lista as tarefas, com filtros opcionais por status, por intervalo de vencimento e por texto no título.
 	/// </summary>
 	/// <remarks>
 	/// A lista vem ordenada pelo vencimento mais próximo; tarefas sem vencimento ficam no fim.

@@ -15,6 +15,9 @@ public record TaskItemFilter : IValidatableObject
 	/// <summary>Vencimento até esta data, inclusive (AAAA-MM-DD).</summary>
 	public DateOnly? DueDateTo { get; init; }
 
+	/// <summary>Busca no título, sem diferenciar maiúsculas de minúsculas (ex.: "estudar").</summary>
+	public string? Search { get; init; }
+
 	public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
 	{
 		List<ValidationResult> errors = new List<ValidationResult>();
