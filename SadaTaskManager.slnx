@@ -1,12 +1,12 @@
 <Solution>
-  <Folder Name="/src/">
-    <Project Path="src/SadaTaskManager.Api/SadaTaskManager.Api.csproj" />
-    <Project Path="src/SadaTaskManager.Application/SadaTaskManager.Application.csproj" />
-    <Project Path="src/SadaTaskManager.Domain/SadaTaskManager.Domain.csproj" />
-    <Project Path="src/SadaTaskManager.Infrastructure/SadaTaskManager.Infrastructure.csproj" />
-  </Folder>
-  <Folder Name="/tests/">
-    <Project Path="tests/SadaTaskManager.IntegrationTests/SadaTaskManager.IntegrationTests.csproj" />
-    <Project Path="tests/SadaTaskManager.UnitTests/SadaTaskManager.UnitTests.csproj" />
-  </Folder>
+	<Folder Name="/src/">
+		<Project Path="src/SadaTaskManager.Api/SadaTaskManager.Api.csproj" />
+		<Project Path="src/SadaTaskManager.Application/SadaTaskManager.Application.csproj" />
+		<Project Path="src/SadaTaskManager.Domain/SadaTaskManager.Domain.csproj" />
+		<Project Path="src/SadaTaskManager.Infrastructure/SadaTaskManager.Infrastructure.csproj" />
+	</Folder>
+	<Folder Name="/tests/">
+		<Project Path="tests/SadaTaskManager.IntegrationTests/SadaTaskManager.IntegrationTests.csproj" />
+		<Project Path="tests/SadaTaskManager.UnitTests/SadaTaskManager.UnitTests.csproj" />
+	</Folder>
 </Solution>
