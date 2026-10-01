@@ -40,11 +40,20 @@ public class TaskItemService : ITaskItemService
 		return TaskItemMapper.ToResponse(task);
 	}
 
-	public async Task<List<TaskItemResponse>> ListAsync(TaskItemFilter filter, CancellationToken cancellationToken)
+	public async Task<TaskItemListResponse> ListAsync(TaskItemFilter filter, CancellationToken cancellationToken)
 	{
 		List<TaskItem> tasks = await _repository.ListAsync(filter, cancellationToken);
 
-		return tasks.Select(task => TaskItemMapper.ToResponse(task)).ToList();
+		List<TaskItemResponse> items = tasks.Select(task => TaskItemMapper.ToResponse(task)).ToList();
+
+		int tasksWithoutDueDate = 0;
+
+		if (filter.DueDateFrom != null || filter.DueDateTo != null)
+		{
+			tasksWithoutDueDate = await _repository.CountWithoutDueDateAsync(filter.Status, cancellationToken);
+		}
+
+		return new TaskItemListResponse(items, tasksWithoutDueDate);
 	}
 
 	public async Task<TaskItemResponse?> UpdateAsync(Guid id, UpdateTaskItemRequest request, CancellationToken cancellationToken)

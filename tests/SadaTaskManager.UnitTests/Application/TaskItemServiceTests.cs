@@ -78,10 +78,32 @@ public class TaskItemServiceTests
 		_repository.Tasks.Add(new TaskItem("Estudar C#"));
 		TaskItemFilter filter = new TaskItemFilter { Status = TaskItemStatus.Pending };
 
-		List<TaskItemResponse> responses = await _service.ListAsync(filter, CancellationToken.None);
+		TaskItemListResponse response = await _service.ListAsync(filter, CancellationToken.None);
 
 		Assert.Same(filter, _repository.LastFilter);
-		Assert.Single(responses);
+		Assert.Single(response.Items);
+	}
+
+	[Fact]
+	public async Task ListAsync_WithDueDateFilter_ReturnsTasksWithoutDueDateCount()
+	{
+		_repository.TasksWithoutDueDateCount = 2;
+		TaskItemFilter filter = new TaskItemFilter { DueDateFrom = DateOnly.FromDateTime(DateTime.UtcNow) };
+
+		TaskItemListResponse response = await _service.ListAsync(filter, CancellationToken.None);
+
+		Assert.Equal(2, response.TasksWithoutDueDate);
+	}
+
+	[Fact]
+	public async Task ListAsync_WithoutDueDateFilter_ReturnsZeroTasksWithoutDueDate()
+	{
+		_repository.TasksWithoutDueDateCount = 2;
+		TaskItemFilter filter = new TaskItemFilter();
+
+		TaskItemListResponse response = await _service.ListAsync(filter, CancellationToken.None);
+
+		Assert.Equal(0, response.TasksWithoutDueDate);
 	}
 
 	[Fact]

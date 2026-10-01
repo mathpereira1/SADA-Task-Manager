@@ -1,6 +1,7 @@
 using SadaTaskManager.Application.Dtos;
 using SadaTaskManager.Application.Interfaces;
 using SadaTaskManager.Domain;
+using SadaTaskManager.Domain.Enums;
 
 namespace SadaTaskManager.UnitTests.Fakes;
 
@@ -11,6 +12,8 @@ public class FakeTaskItemRepository : ITaskItemRepository
 	public int UpdateCount { get; private set; }
 
 	public TaskItemFilter? LastFilter { get; private set; }
+
+	public int TasksWithoutDueDateCount { get; set; }
 
 	public Task AddAsync(TaskItem task, CancellationToken cancellationToken)
 	{
@@ -35,6 +38,11 @@ public class FakeTaskItemRepository : ITaskItemRepository
 	{
 		LastFilter = filter;
 		return Task.FromResult(new List<TaskItem>(Tasks));
+	}
+
+	public Task<int> CountWithoutDueDateAsync(TaskItemStatus? status, CancellationToken cancellationToken)
+	{
+		return Task.FromResult(TasksWithoutDueDateCount);
 	}
 
 	public Task UpdateAsync(TaskItem task, CancellationToken cancellationToken)

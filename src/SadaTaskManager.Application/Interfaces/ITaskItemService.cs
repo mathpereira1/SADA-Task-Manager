@@ -8,7 +8,7 @@ public interface ITaskItemService
 
 	Task<TaskItemResponse?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
 
-	Task<List<TaskItemResponse>> ListAsync(TaskItemFilter filter, CancellationToken cancellationToken);
+	Task<TaskItemListResponse> ListAsync(TaskItemFilter filter, CancellationToken cancellationToken);
 
 	Task<TaskItemResponse?> UpdateAsync(Guid id, UpdateTaskItemRequest request, CancellationToken cancellationToken);
 
